@@ -1,8 +1,9 @@
 // Guarda la "cáscara" de la app para que abra rápido y sin conexión.
 // Los datos (horarios, box, permisos) siempre se piden en línea a la planilla.
-var VERSION = 'box-libres-v1';
+var VERSION = 'cesfam-apps-v2';
 var ARCHIVOS = ['./', './index.html', './manifest.json',
-  './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
+  './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png',
+  './box.html', './box-manifest.json', './icons/box-icon-192.png', './icons/box-icon-512.png', './icons/box-apple-touch-icon.png'];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(VERSION).then(function (c) { return c.addAll(ARCHIVOS); }));

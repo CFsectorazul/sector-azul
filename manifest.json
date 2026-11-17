@@ -1,13 +1,14 @@
 {
-  "name": "Box Libres · CESFAM Cienfuegos",
-  "short_name": "Box Libres",
-  "description": "Box desocupados por semana y horario",
+  "name": "Sector Azul · CESFAM Cienfuegos",
+  "short_name": "Sector Azul",
+  "description": "Turnos, box, permisos y reuniones del Sector Azul",
   "lang": "es-CL",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#0f6b55",
-  "theme_color": "#0f6b55",
+  "orientation": "portrait",
+  "background_color": "#1f4e9e",
+  "theme_color": "#1f4e9e",
   "icons": [
     {
       "src": "icons/icon-192.png",
@@ -25,5 +26,6 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "id": "./"
 }
