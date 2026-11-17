@@ -1,0 +1,30 @@
+{
+  "name": "Box Libres · CESFAM Cienfuegos",
+  "short_name": "Box Libres",
+  "description": "Box desocupados por semana y horario",
+  "lang": "es-CL",
+  "start_url": "box.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0f6b55",
+  "theme_color": "#0f6b55",
+  "icons": [
+    {
+      "src": "icons/box-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/box-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/box-icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "id": "box.html"
+}

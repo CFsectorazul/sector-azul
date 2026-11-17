@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Sector Azul · CESFAM Cienfuegos</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1f4e9e">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sector Azul">
+<meta charset="utf-8">
+<style>
+  :root{
+    --azul:#1f4e9e; --azul-osc:#163a78; --azul-claro:#e8effb; --azul-borde:#c9d7f2;
+    --texto:#1d2433; --suave:#5d6880; --fondo:#f3f6fb; --blanco:#fff;
+    --verde:#1e7a4f; --verde-claro:#e3f4ea; --naranjo:#b45309; --naranjo-claro:#fdf0e1;
+    --gris-claro:#eef0f4; --rojo:#b42318;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--fondo);color:var(--texto);
+    font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .app{max-width:640px;margin:0 auto;min-height:100vh;padding-bottom:40px}
+  header{background:var(--azul);color:#fff;padding:18px 18px 14px}
+  header .marca{font-size:13px;letter-spacing:.04em;opacity:.85;text-transform:uppercase}
+  header h1{margin:4px 0 0;font-size:21px;font-weight:650}
+  header .cargo{font-size:14px;opacity:.85}
+  header .fila{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+  .salir{background:transparent;border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:8px;
+    padding:6px 10px;font-size:13px;cursor:pointer;white-space:nowrap}
+
+  /* Login */
+  .login{padding:32px 20px}
+  .tarjeta{background:var(--blanco);border-radius:14px;padding:22px;box-shadow:0 1px 3px rgba(20,40,80,.08)}
+  .login h2{margin:0 0 6px;font-size:20px}
+  .login p{margin:0 0 18px;color:var(--suave);font-size:15px}
+  label{display:block;font-size:14px;font-weight:600;margin:14px 0 6px}
+  input[type=text],input[type=password]{width:100%;font-size:20px;padding:12px 14px;border:1.5px solid var(--azul-borde);
+    border-radius:10px;outline:none;letter-spacing:.03em;background:#fff}
+  input:focus{border-color:var(--azul)}
+  .recordar{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:14px;color:var(--suave)}
+  .btn{width:100%;margin-top:18px;background:var(--azul);color:#fff;border:0;border-radius:10px;
+    padding:14px;font-size:17px;font-weight:600;cursor:pointer}
+  .btn:disabled{opacity:.6}
+  .error{color:var(--rojo);font-size:14px;margin-top:12px;min-height:1em}
+
+  /* Pestañas */
+  nav{display:flex;background:var(--blanco);border-bottom:1px solid var(--azul-borde);position:sticky;top:0;z-index:5}
+  nav button{flex:1;background:none;border:0;padding:13px 6px;font-size:15px;color:var(--suave);
+    border-bottom:3px solid transparent;cursor:pointer;font-weight:600}
+  nav button.activa{color:var(--azul);border-bottom-color:var(--azul)}
+  section{padding:14px}
+
+  .semana{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+  .semana button{background:var(--blanco);border:1px solid var(--azul-borde);color:var(--azul);
+    border-radius:9px;padding:8px 12px;font-size:15px;cursor:pointer;min-width:44px}
+  .semana .centro{text-align:center;flex:1}
+  .semana .centro b{display:block;font-size:16px}
+  .semana .centro small{color:var(--suave);font-size:13px}
+  .semana .centro a{color:var(--azul);font-size:13px;cursor:pointer;text-decoration:underline}
+
+  .dia{background:var(--blanco);border-radius:12px;padding:14px 16px;margin-bottom:10px;
+    box-shadow:0 1px 2px rgba(20,40,80,.06);border-left:5px solid var(--azul-borde)}
+  .dia.hoy{border-left-color:var(--azul)}
+  .dia.libre{border-left-color:var(--verde)}
+  .dia .cab{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+  .dia h3{margin:0;font-size:17px}
+  .etiqueta{display:inline-block;font-size:12px;font-weight:700;padding:3px 8px;border-radius:20px;letter-spacing:.03em}
+  .et-hoy{background:var(--azul);color:#fff}
+  .et-perm{background:var(--naranjo-claro);color:var(--naranjo);font-size:14px;padding:4px 10px}
+  .et-fer{background:var(--gris-claro);color:var(--suave)}
+  .horario{margin:6px 0 2px;color:var(--suave);font-size:15px}
+  .horario b{color:var(--texto)}
+  .boxes{margin:8px 0 0;padding:0;list-style:none}
+  .boxes li{display:flex;justify-content:space-between;gap:10px;padding:7px 10px;background:var(--azul-claro);
+    border-radius:8px;margin-top:5px;font-size:15px}
+  .boxes li .b{font-weight:700;color:var(--azul-osc)}
+  .boxes li .ext{font-size:12px;color:var(--suave);margin-left:4px}
+  .reu{margin-top:8px;padding:8px 10px;border-radius:8px;background:#f6f3ff;font-size:14px}
+  .reu b{display:block;font-size:14px}
+  .reu span{color:var(--suave)}
+  .vacio{color:var(--suave);font-size:14px;margin-top:6px}
+  .aviso{background:var(--azul-claro);color:var(--azul-osc);font-size:14px;padding:10px 12px;border-radius:10px;margin-bottom:12px}
+
+  .grupo{font-size:13px;font-weight:700;color:var(--suave);text-transform:uppercase;letter-spacing:.05em;margin:16px 4px 8px}
+  .item{background:var(--blanco);border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;
+    align-items:center;gap:12px;box-shadow:0 1px 2px rgba(20,40,80,.06)}
+  .sigla{min-width:58px;text-align:center;font-weight:800;font-size:16px;padding:8px 6px;border-radius:9px;
+    background:var(--naranjo-claro);color:var(--naranjo)}
+  .item.pasado .sigla{background:var(--gris-claro);color:var(--suave)}
+  .item .det{font-size:15px}
+  .item .det small{display:block;color:var(--suave);font-size:13px}
+  .fecha-reu{min-width:58px;text-align:center;background:var(--azul-claro);color:var(--azul-osc);border-radius:9px;padding:6px}
+  .fecha-reu b{display:block;font-size:20px;line-height:1.1}
+  .fecha-reu small{font-size:12px}
+
+  .pie{padding:0 16px;text-align:center;color:var(--suave);font-size:12px;margin-top:18px}
+  .cargando{text-align:center;color:var(--suave);padding:40px 0}
+  .oculto{display:none}
+
+  header{padding-top:calc(18px + env(safe-area-inset-top))}
+  .instalar{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));max-width:616px;margin:0 auto;
+    background:#163a78;color:#fff;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;
+    box-shadow:0 6px 24px rgba(10,30,70,.3);z-index:20;font-size:14px}
+  .instalar img{width:40px;height:40px;border-radius:10px}
+  .instalar .txt{flex:1}
+  .instalar .txt .tit{display:block;font-weight:700;font-size:15px}
+  .instalar button{background:#fff;color:#163a78;border:0;border-radius:9px;padding:9px 12px;font-weight:700;font-size:14px;cursor:pointer}
+  .instalar .cerrar{background:transparent;color:#fff;opacity:.8;padding:6px;font-size:18px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== LOGIN ===== -->
+  <div id="vLogin">
+    <header>
+      <div class="marca">CESFAM Prof. Eugenio Cienfuegos</div>
+      <h1>Sector Azul</h1>
+      <div class="cargo">Mis turnos, box y permisos</div>
+    </header>
+    <div class="login">
+      <div class="tarjeta">
+        <h2>Ingresa con tu RUT</h2>
+        <p>Verás solo tu información: horario, box de cada día, permisos y reuniones.</p>
+        <form id="fLogin" autocomplete="off">
+          <label for="rut">RUT</label>
+          <input id="rut" type="text" inputmode="text" placeholder="12.345.678-9" maxlength="12">
+          <div id="cajaClave" class="oculto">
+            <label for="clave">Clave personal</label>
+            <input id="clave" type="password" inputmode="numeric" maxlength="20">
+          </div>
+          <label class="recordar"><input type="checkbox" id="recordar"> Recordarme en este teléfono</label>
+          <button class="btn" id="btnEntrar" type="submit">Entrar</button>
+          <div class="error" id="errLogin"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== APP ===== -->
+  <div id="vApp" class="oculto">
+    <header>
+      <div class="fila">
+        <div>
+          <div class="marca">Sector Azul · CESFAM Cienfuegos</div>
+          <h1 id="hNombre"></h1>
+          <div class="cargo" id="hCargo"></div>
+        </div>
+        <button class="salir" id="btnSalir">Salir</button>
+      </div>
+    </header>
+    <nav>
+      <button class="activa" data-tab="tSemana">Mi semana</button>
+      <button data-tab="tPermisos">Permisos</button>
+      <button data-tab="tReuniones">Reuniones</button>
+    </nav>
+
+    <section id="tSemana">
+      <div class="semana">
+        <button id="btnAnt" aria-label="Semana anterior">‹</button>
+        <div class="centro"><b id="sTitulo">Esta semana</b><small id="sRango"></small><br><a id="lnkHoy" class="oculto">Volver a esta semana</a></div>
+        <button id="btnSig" aria-label="Semana siguiente">›</button>
+      </div>
+      <div id="sAvisos"></div>
+      <div id="sDias"><div class="cargando">Cargando…</div></div>
+    </section>
+
+    <section id="tPermisos" class="oculto"><div id="pLista"></div></section>
+    <section id="tReuniones" class="oculto"><div id="rLista"></div></section>
+
+    <div class="pie" id="pie"></div>
+  </div>
+</div>
+
+<div id="bInstalar" class="instalar oculto">
+  <img src="icons/icon-192.png" alt="">
+  <div class="txt"><span class="tit">Instala la app</span><span id="bTexto">Queda en tu pantalla de inicio, como cualquier aplicación.</span></div>
+  <button id="btnInstalar">Instalar</button>
+  <button class="cerrar" id="btnCerrarInst" aria-label="Cerrar">✕</button>
+</div>
+
+<script>
+  // ===== Conexión con la planilla (Apps Script) =====
+  var API_URL = 'https://script.google.com/macros/s/AKfycby8ElW5j8lFbhI-e7iQVNkNqBNEpLPd-5w34bldD-54pMHQffYQTYMFwkAdF-8SPiWW/exec';
+
+  function llamarApi(datos) {
+    return fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(datos)
+    }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+  }
+  function ultGuardar(d) { try { if (localStorage.getItem('azul_rut')) localStorage.setItem('azul_ult', JSON.stringify(d)); } catch (e) {} }
+  function ultLeer() { try { return JSON.parse(localStorage.getItem('azul_ult') || 'null'); } catch (e) { return null; } }
+
+  // Imita google.script.run para reutilizar la misma pantalla
+  var google = { script: { get run() {
+    var ok = function () {}, fail = function () {};
+    var api = {
+      withSuccessHandler: function (f) { ok = f; return api; },
+      withFailureHandler: function (f) { fail = f; return api; },
+      iniciarSesion: function (rut, clave) {
+        llamarApi({ accion: 'login', rut: rut, clave: clave }).then(ok).catch(function (e) {
+          var u = ultLeer();
+          if (u && u.ok) ok({ ok: true, nombre: u.nombre, cargo: u.cargo }); else fail(e);
+        });
+      },
+      obtenerDatos: function (rut, clave, semana) {
+        llamarApi({ accion: 'datos', rut: rut, clave: clave, semana: semana }).then(function (d) {
+          if (d && d.ok && d.semana === 0) ultGuardar(d);
+          ok(d);
+        }).catch(function (e) {
+          var u = ultLeer();
+          if (u && u.ok && semana === 0) { u.sinConexion = true; ok(u); } else fail(e);
+        });
+      }
+    };
+    return api;
+  } } };
+</script>
+<script>
+  var sesion = { rut: '', clave: '' };
+  var semanaActual = 0;
+  var ultimo = null;
+
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function guardar(k, v){ try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch(e){} }
+  function leer(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }
+
+  // Formato de RUT mientras se escribe: 12.345.678-9
+  $('rut').addEventListener('input', function(){
+    var l = this.value.toUpperCase().replace(/[^0-9K]/g, '').slice(0, 9);
+    if (l.length > 1) {
+      var cuerpo = l.slice(0, -1).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+      this.value = cuerpo + '-' + l.slice(-1);
+    } else this.value = l;
+  });
+
+  $('fLogin').addEventListener('submit', function(e){
+    e.preventDefault();
+    entrar($('rut').value, $('clave').value);
+  });
+
+  function entrar(rut, clave){
+    $('errLogin').textContent = '';
+    $('btnEntrar').disabled = true; $('btnEntrar').textContent = 'Entrando…';
+    google.script.run.withSuccessHandler(function(r){
+      $('btnEntrar').disabled = false; $('btnEntrar').textContent = 'Entrar';
+      if (!r.ok) {
+        if (r.pideClave) $('cajaClave').classList.remove('oculto');
+        $('errLogin').textContent = r.error || 'No se pudo entrar.';
+        mostrar('vLogin');
+        return;
+      }
+      sesion = { rut: rut, clave: clave || '' };
+      if ($('recordar').checked) { guardar('azul_rut', rut); guardar('azul_clave', clave || ''); }
+      $('hNombre').textContent = r.nombre; $('hCargo').textContent = r.cargo || '';
+      mostrar('vApp');
+      cargar(0);
+    }).withFailureHandler(function(err){
+      $('btnEntrar').disabled = false; $('btnEntrar').textContent = 'Entrar';
+      $('errLogin').textContent = 'No hay conexión o hubo un error. Inténtalo de nuevo.';
+    }).iniciarSesion(rut, clave || '');
+  }
+
+  function mostrar(v){ $('vLogin').classList.toggle('oculto', v !== 'vLogin'); $('vApp').classList.toggle('oculto', v !== 'vApp'); }
+
+  $('btnSalir').addEventListener('click', function(){
+    guardar('azul_rut', null); guardar('azul_clave', null); guardar('azul_ult', null);
+    sesion = { rut: '', clave: '' }; $('rut').value = ''; $('clave').value = '';
+    mostrar('vLogin');
+  });
+
+  document.querySelectorAll('nav button').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('nav button').forEach(function(x){ x.classList.toggle('activa', x === b); });
+      ['tSemana','tPermisos','tReuniones'].forEach(function(t){ $(t).classList.toggle('oculto', t !== b.dataset.tab); });
+    });
+  });
+  $('btnAnt').addEventListener('click', function(){ cargar(semanaActual - 1); });
+  $('btnSig').addEventListener('click', function(){ cargar(semanaActual + 1); });
+  $('lnkHoy').addEventListener('click', function(){ cargar(0); });
+
+  function cargar(semana){
+    $('sDias').innerHTML = '<div class="cargando">Cargando…</div>';
+    google.script.run.withSuccessHandler(function(d){
+      if (!d.ok) { $('sDias').innerHTML = '<div class="aviso">' + esc(d.error) + '</div>'; return; }
+      semanaActual = d.semana; ultimo = d;
+      pintarSemana(d); pintarPermisos(d); pintarReuniones(d);
+      $('pie').textContent = (d.sinConexion ? 'Sin conexión: mostrando lo guardado el ' : 'Información de la planilla del CESFAM · actualizado ') + d.actualizado;
+    }).withFailureHandler(function(){
+      $('sDias').innerHTML = '<div class="aviso">No se pudo cargar. Revisa tu conexión e inténtalo de nuevo.</div>';
+    }).obtenerDatos(sesion.rut, sesion.clave, semana);
+  }
+
+  function pintarSemana(d){
+    $('sTitulo').textContent = d.semana === 0 ? 'Esta semana' : d.semana === 1 ? 'Próxima semana'
+      : d.semana === -1 ? 'Semana pasada' : (d.semana > 0 ? 'En ' + d.semana + ' semanas' : 'Hace ' + (-d.semana) + ' semanas');
+    $('sRango').textContent = d.rangoSemana;
+    $('lnkHoy').classList.toggle('oculto', d.semana === 0);
+
+    var av = [];
+    if (d.sinHorario) av.push('Tu horario laboral aún no está ingresado en la planilla.');
+    if (d.sinBox) av.push('No tienes un box asignado en la matriz.');
+    $('sAvisos').innerHTML = av.map(function(a){ return '<div class="aviso">' + esc(a) + '</div>'; }).join('');
+
+    $('sDias').innerHTML = d.dias.map(function(x){
+      var ausente = x.permisos.length > 0;
+      var h = '<div class="dia' + (x.esHoy ? ' hoy' : '') + (ausente ? ' libre' : '') + '">';
+      h += '<div class="cab"><h3>' + esc(x.titulo) + '</h3><div>';
+      if (x.esHoy) h += '<span class="etiqueta et-hoy">HOY</span> ';
+      x.permisos.forEach(function(p){ h += '<span class="etiqueta et-perm">' + esc(p) + '</span> '; });
+      if (x.feriado) h += '<span class="etiqueta et-fer">Feriado</span>';
+      h += '</div></div>';
+      if (x.feriado) h += '<div class="horario">' + esc(x.feriado) + '</div>';
+      if (x.horario) h += '<div class="horario">Horario: <b>' + esc(x.horario) + '</b></div>';
+      if (x.boxes.length) {
+        h += '<ul class="boxes">' + x.boxes.map(function(b){
+          return '<li><span class="b">' + esc(b.box) + '</span><span>' + esc(b.desde) + ' – ' + esc(b.hasta) +
+                 (b.ext ? '<span class="ext">ext.</span>' : '') + '</span></li>';
+        }).join('') + '</ul>';
+      } else if (x.horario && !d.sinBox) {
+        h += '<div class="vacio">Sin box asignado este día.</div>';
+      }
+      if (!x.horario && !x.boxes.length && !x.permisos.length && !x.feriado && !x.reuniones.length) {
+        h += '<div class="vacio">Sin horario este día.</div>';
+      }
+      x.reuniones.forEach(function(r){
+        h += '<div class="reu"><b>' + esc(r.actividad) + '</b><span>' + esc(r.horario || 'Horario por confirmar') + '</span></div>';
+      });
+      return h + '</div>';
+    }).join('');
+  }
+
+  function pintarPermisos(d){
+    var hoy = d.hoy;
+    var vig = d.permisos.filter(function(p){ return p.hasta >= hoy; }).reverse();
+    var ant = d.permisos.filter(function(p){ return p.hasta < hoy; });
+    function item(p, pasado){
+      return '<div class="item' + (pasado ? ' pasado' : '') + '"><div class="sigla">' + esc(p.sigla) + '</div>' +
+        '<div class="det">' + esc(p.texto) + (p.jornada ? ' · ' + esc(p.jornada) : '') +
+        '<small>' + (p.dias ? (p.dias == 0.5 ? 'medio día' : esc(String(p.dias).replace('.', ',')) + (p.dias == 1 ? ' día' : ' días')) : '') + '</small></div></div>';
+    }
+    var h = '<div class="grupo">Vigentes y próximos</div>';
+    h += vig.length ? vig.map(function(p){ return item(p, false); }).join('') : '<div class="vacio">No tienes permisos vigentes ni próximos.</div>';
+    h += '<div class="grupo">Anteriores</div>';
+    h += ant.length ? ant.map(function(p){ return item(p, true); }).join('') : '<div class="vacio">Sin permisos anteriores registrados.</div>';
+    $('pLista').innerHTML = h;
+  }
+
+  function pintarReuniones(d){
+    var r = d.proximasReuniones;
+    var h = '<div class="grupo">Próximos 30 días</div>';
+    if (!r.length) h += '<div class="vacio">No tienes reuniones ni bloqueos programados.</div>';
+    h += r.map(function(x){
+      var p = x.fecha.split('-'), mes = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][+p[1]-1];
+      return '<div class="item"><div class="fecha-reu"><b>' + (+p[2]) + '</b><small>' + mes + '</small></div>' +
+        '<div class="det">' + esc(x.actividad) + '<small>' + esc(x.fechaTexto.split(' ')[0]) + ' · ' +
+        esc(x.horario || 'Horario por confirmar') + '</small></div></div>';
+    }).join('');
+    $('rLista').innerHTML = h;
+  }
+
+  // Entrada automática si eligió "Recordarme"
+  (function(){
+    var r = leer('azul_rut');
+    if (r) { $('rut').value = r; $('recordar').checked = true; entrar(r, leer('azul_clave') || ''); }
+  })();
+
+  // ===== Instalación como app =====
+  (function(){
+    var esStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    var cerrado = leer('azul_inst_cerrado');
+    var evento = null;
+    function mostrarBanner(texto, conBoton){
+      if (esStandalone || cerrado) return;
+      if (texto) $('bTexto').innerHTML = texto;
+      $('btnInstalar').classList.toggle('oculto', !conBoton);
+      $('bInstalar').classList.remove('oculto');
+    }
+    window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); evento = e; mostrarBanner(null, true); });
+    $('btnInstalar').addEventListener('click', function(){
+      if (!evento) return;
+      evento.prompt();
+      evento.userChoice.then(function(){ evento = null; $('bInstalar').classList.add('oculto'); });
+    });
+    $('btnCerrarInst').addEventListener('click', function(){ guardar('azul_inst_cerrado', '1'); $('bInstalar').classList.add('oculto'); });
+    window.addEventListener('appinstalled', function(){ $('bInstalar').classList.add('oculto'); });
+    var ua = navigator.userAgent;
+    var esIOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    if (esIOS && !esStandalone) {
+      var enSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua);
+      mostrarBanner(enSafari ? 'Toca <b>Compartir</b> ⬆️ y luego <b>"Agregar a inicio"</b>.'
+                             : 'Abre este link en <b>Safari</b> y toca Compartir ⬆️ → "Agregar a inicio".', false);
+    }
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
+  })();
+</script>
+</body>
+</html>

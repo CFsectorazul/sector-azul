@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Box Libres · CESFAM Cienfuegos</title>
+<link rel="manifest" href="box-manifest.json">
+<meta name="theme-color" content="#0f6b55">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/box-icon-192.png">
+<link rel="apple-touch-icon" href="icons/box-apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Box Libres">
+<style>
+  :root{
+    --pri:#0f6b55; --pri-osc:#0a4e3e; --pri-claro:#e3f3ee; --borde:#cfe3dc;
+    --texto:#1b2430; --suave:#5d6878; --fondo:#f2f5f4; --blanco:#fff;
+    --libre:#1f9d6e; --libre-claro:#dcf3e8; --temp:#c27c0e; --temp-claro:#fdf0d9;
+    --ocup:#e7eaee; --rojo:#b42318;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--fondo);color:var(--texto);
+    font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .app{max-width:980px;margin:0 auto;min-height:100vh;padding-bottom:40px}
+  header{background:var(--pri);color:#fff;padding:18px 18px 14px;padding-top:calc(18px + env(safe-area-inset-top))}
+  header .marca{font-size:13px;letter-spacing:.04em;opacity:.85;text-transform:uppercase}
+  header h1{margin:4px 0 0;font-size:21px;font-weight:650}
+  header .sub{font-size:14px;opacity:.85}
+  header .fila{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+  .salir{background:transparent;border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer}
+  .oculto{display:none!important}
+
+  .login{padding:32px 20px;max-width:520px;margin:0 auto}
+  .tarjeta{background:var(--blanco);border-radius:14px;padding:22px;box-shadow:0 1px 3px rgba(20,50,40,.08)}
+  .login h2{margin:0 0 6px;font-size:20px}
+  .login p{margin:0 0 18px;color:var(--suave);font-size:15px}
+  label{display:block;font-size:14px;font-weight:600;margin:14px 0 6px}
+  input[type=password]{width:100%;font-size:19px;padding:12px 14px;border:1.5px solid var(--borde);border-radius:10px;outline:none}
+  input:focus{border-color:var(--pri)}
+  .recordar{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:14px;color:var(--suave);font-weight:400}
+  .btn{width:100%;margin-top:18px;background:var(--pri);color:#fff;border:0;border-radius:10px;padding:14px;font-size:17px;font-weight:600;cursor:pointer}
+  .btn:disabled{opacity:.6}
+  .error{color:var(--rojo);font-size:14px;margin-top:12px;min-height:1em}
+
+  .barra{background:var(--blanco);border-bottom:1px solid var(--borde);padding:12px 14px 10px;position:sticky;top:0;z-index:5}
+  .semana{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .semana button{background:var(--blanco);border:1px solid var(--borde);color:var(--pri);border-radius:9px;padding:7px 13px;font-size:16px;cursor:pointer}
+  .semana .centro{text-align:center;flex:1}
+  .semana .centro b{display:block;font-size:16px}
+  .semana .centro small{color:var(--suave);font-size:13px}
+  .semana .centro a{color:var(--pri);font-size:13px;cursor:pointer;text-decoration:underline;margin-left:6px}
+  .dias{display:flex;gap:6px;margin-top:10px;overflow-x:auto;scrollbar-width:none}
+  .dias::-webkit-scrollbar{display:none}
+  .dias button{flex:1;min-width:58px;background:var(--fondo);border:1px solid transparent;border-radius:10px;padding:6px 4px;cursor:pointer;color:var(--texto);font-size:13px;line-height:1.2}
+  .dias button b{display:block;font-size:15px}
+  .dias button.activo{background:var(--pri);color:#fff}
+  .dias button.hoy:not(.activo){border-color:var(--pri)}
+  .dias button.fer{opacity:.55}
+
+  .filtros{padding:12px 14px 0;display:flex;flex-direction:column;gap:8px}
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{background:var(--blanco);border:1px solid var(--borde);border-radius:20px;padding:6px 12px;font-size:14px;cursor:pointer;color:var(--texto)}
+  .seg button.activo{background:var(--pri-claro);border-color:var(--pri);color:var(--pri-osc);font-weight:600}
+  .rango{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--suave)}
+  .rango select{font-size:15px;padding:6px 8px;border:1px solid var(--borde);border-radius:8px;background:#fff}
+
+  main{padding:12px 14px}
+  .resumen{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:2px 2px 10px}
+  .resumen .txt{font-size:15px}
+  .resumen .txt b{color:var(--pri-osc)}
+  .vista{display:flex;background:var(--blanco);border:1px solid var(--borde);border-radius:9px;overflow:hidden}
+  .vista button{background:none;border:0;padding:6px 12px;font-size:14px;cursor:pointer;color:var(--suave)}
+  .vista button.activo{background:var(--pri);color:#fff}
+
+  .lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px}
+  .box{background:var(--blanco);border-radius:12px;padding:12px 14px;box-shadow:0 1px 2px rgba(20,50,40,.06);border-left:5px solid var(--libre)}
+  .box.parcial{border-left-color:#9fd8bf}
+  .box .cab{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .box h3{margin:0;font-size:17px}
+  .box .min{font-size:13px;color:var(--suave);white-space:nowrap}
+  .tags{margin-top:4px;display:flex;gap:6px;flex-wrap:wrap}
+  .tag{font-size:11px;font-weight:700;letter-spacing:.03em;padding:2px 8px;border-radius:20px;background:var(--fondo);color:var(--suave)}
+  .tag.todo{background:var(--libre);color:#fff}
+  .franjas{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
+  .fr{font-size:14px;font-weight:600;padding:5px 10px;border-radius:8px;background:var(--libre-claro);color:#0d6b47;font-variant-numeric:tabular-nums}
+  .fr.t{background:var(--temp-claro);color:var(--temp)}
+  .fr small{font-weight:500;opacity:.85}
+
+  .grilla{overflow:auto;background:var(--blanco);border-radius:12px;box-shadow:0 1px 2px rgba(20,50,40,.06);max-height:70vh}
+  table{border-collapse:separate;border-spacing:0;font-size:12px}
+  th,td{padding:0;text-align:center}
+  thead th{position:sticky;top:0;background:var(--blanco);z-index:2;padding:6px 2px;font-weight:600;color:var(--suave);white-space:nowrap;border-bottom:1px solid var(--borde)}
+  thead th.vert{writing-mode:vertical-rl;transform:rotate(180deg);height:78px;padding:4px 2px}
+  tbody th{position:sticky;left:0;background:var(--blanco);z-index:1;padding:0 8px;font-weight:500;color:var(--suave);white-space:nowrap;font-variant-numeric:tabular-nums;border-right:1px solid var(--borde)}
+  thead th:first-child{left:0;z-index:3}
+  td{width:26px;min-width:26px;height:20px;border-right:1px solid #fff;border-bottom:1px solid #fff}
+  td.L{background:var(--libre)} td.T{background:#f0b44c} td.O{background:var(--ocup)}
+  tr.hora td,tr.hora th{border-top:2px solid #fff}
+  tr.extini th{color:var(--pri-osc);font-weight:700}
+
+  .leyenda{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--suave);margin:12px 2px 0}
+  .leyenda span{display:inline-flex;align-items:center;gap:6px}
+  .leyenda i{display:inline-block;width:14px;height:14px;border-radius:4px}
+  .aviso{background:var(--pri-claro);color:var(--pri-osc);font-size:15px;padding:14px;border-radius:12px}
+  .vacio{color:var(--suave);font-size:15px;padding:20px 4px;text-align:center}
+  .cargando{text-align:center;color:var(--suave);padding:40px 0}
+  .pie{text-align:center;color:var(--suave);font-size:12px;margin-top:18px;padding:0 16px}
+
+  .instalar{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));max-width:616px;margin:0 auto;
+    background:var(--pri-osc);color:#fff;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;
+    box-shadow:0 6px 24px rgba(10,40,30,.3);z-index:20;font-size:14px}
+  .instalar img{width:40px;height:40px;border-radius:10px}
+  .instalar .txt{flex:1}
+  .instalar .txt .tit{display:block;font-weight:700;font-size:15px}
+  .instalar button{background:#fff;color:var(--pri-osc);border:0;border-radius:9px;padding:9px 12px;font-weight:700;font-size:14px;cursor:pointer}
+  .instalar .cerrar{background:transparent;color:#fff;opacity:.8;padding:6px;font-size:18px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div id="vLogin">
+    <header>
+      <div class="marca">CESFAM Prof. Eugenio Cienfuegos</div>
+      <h1>Box Libres</h1>
+      <div class="sub">Disponibilidad de box por semana</div>
+    </header>
+    <div class="login">
+      <div class="tarjeta">
+        <h2>Acceso administración</h2>
+        <p>Ingresa la clave para ver qué box están desocupados y en qué horario.</p>
+        <form id="fLogin" autocomplete="off">
+          <label for="clave">Clave</label>
+          <input id="clave" type="password">
+          <label class="recordar"><input type="checkbox" id="recordar"> Recordarme en este equipo</label>
+          <button class="btn" id="btnEntrar" type="submit">Entrar</button>
+          <div class="error" id="errLogin"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="vApp" class="oculto">
+    <header>
+      <div class="fila">
+        <div>
+          <div class="marca">CESFAM Prof. Eugenio Cienfuegos</div>
+          <h1>Box Libres</h1>
+        </div>
+        <button class="salir" id="btnSalir">Salir</button>
+      </div>
+    </header>
+
+    <div class="barra">
+      <div class="semana">
+        <button id="btnAnt" aria-label="Semana anterior">‹</button>
+        <div class="centro"><b id="sTitulo">Esta semana</b><small id="sRango"></small><a id="lnkHoy" class="oculto">Hoy</a></div>
+        <button id="btnSig" aria-label="Semana siguiente">›</button>
+      </div>
+      <div class="dias" id="dias"></div>
+    </div>
+
+    <div class="filtros">
+      <div class="seg" id="segFranja">
+        <button data-f="todo" class="activo">Todo el día</button>
+        <button data-f="am">Mañana</button>
+        <button data-f="pm">Tarde</button>
+        <button data-f="ext">Extensión</button>
+        <button data-f="rango">Elegir horario</button>
+      </div>
+      <div class="rango oculto" id="cajaRango">
+        Desde <select id="selDesde"></select> hasta <select id="selHasta"></select>
+      </div>
+      <div class="seg" id="segTipo">
+        <button data-t="todos" class="activo">Todos los box</button>
+        <button data-t="clin">Clínicos</button>
+        <button data-t="otros">Otros</button>
+      </div>
+    </div>
+
+    <main>
+      <div class="resumen">
+        <div class="txt" id="resumen"></div>
+        <div class="vista">
+          <button data-v="lista" class="activo">Lista</button>
+          <button data-v="grilla">Grilla</button>
+        </div>
+      </div>
+      <div id="contenido"><div class="cargando">Cargando…</div></div>
+      <div class="leyenda">
+        <span><i style="background:var(--libre)"></i>Libre</span>
+        <span><i style="background:#f0b44c"></i>Libre por ausencia (permiso o licencia)</span>
+        <span id="leyOcup" class="oculto"><i style="background:var(--ocup)"></i>Ocupado</span>
+      </div>
+      <div class="pie" id="pie"></div>
+    </main>
+  </div>
+</div>
+
+<div id="bInstalar" class="instalar oculto">
+  <img src="icons/box-icon-192.png" alt="">
+  <div class="txt"><span class="tit">Instala la app</span><span id="bTexto">Queda en tu pantalla de inicio, como cualquier aplicación.</span></div>
+  <button id="btnInstalar">Instalar</button>
+  <button class="cerrar" id="btnCerrarInst" aria-label="Cerrar">✕</button>
+</div>
+
+<script>
+  var API_URL = 'https://script.google.com/macros/s/AKfycby8ElW5j8lFbhI-e7iQVNkNqBNEpLPd-5w34bldD-54pMHQffYQTYMFwkAdF-8SPiWW/exec';
+
+  var estado = { clave: '', semana: 0, datos: null, dia: 0, franja: 'todo', tipo: 'todos', vista: 'lista', desde: null, hasta: null };
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function guardar(k, v){ try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch(e){} }
+  function leer(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }
+  function hh(m){ return String(Math.floor(m/60)).padStart(2,'0') + ':' + String(m%60).padStart(2,'0'); }
+  function dur(m){ var h = Math.floor(m/60), r = m%60; return (h ? h + ' h' : '') + (h && r ? ' ' : '') + (r ? r + ' min' : ''); }
+
+  function api(datos){
+    return fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(datos) })
+      .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+  }
+
+  // ---------- Login ----------
+  $('fLogin').addEventListener('submit', function(e){ e.preventDefault(); entrar($('clave').value); });
+  function entrar(clave){
+    $('errLogin').textContent = '';
+    $('btnEntrar').disabled = true; $('btnEntrar').textContent = 'Entrando…';
+    api({ accion: 'box', clave: clave, semana: 0 }).then(function(d){
+      $('btnEntrar').disabled = false; $('btnEntrar').textContent = 'Entrar';
+      if (!d.ok) { $('errLogin').textContent = d.error || 'No se pudo entrar.'; mostrar('vLogin'); return; }
+      estado.clave = clave;
+      if ($('recordar').checked) guardar('box_clave', clave);
+      mostrar('vApp'); recibir(d, true);
+    }).catch(function(){
+      $('btnEntrar').disabled = false; $('btnEntrar').textContent = 'Entrar';
+      $('errLogin').textContent = 'No hay conexión o hubo un error. Inténtalo de nuevo.';
+    });
+  }
+  function mostrar(v){ $('vLogin').classList.toggle('oculto', v !== 'vLogin'); $('vApp').classList.toggle('oculto', v !== 'vApp'); }
+  $('btnSalir').addEventListener('click', function(){ guardar('box_clave', null); estado.clave = ''; $('clave').value = ''; mostrar('vLogin'); });
+
+  // ---------- Semana ----------
+  function cargar(semana){
+    $('contenido').innerHTML = '<div class="cargando">Cargando…</div>';
+    api({ accion: 'box', clave: estado.clave, semana: semana }).then(function(d){
+      if (!d.ok) { $('contenido').innerHTML = '<div class="aviso">' + esc(d.error) + '</div>'; return; }
+      recibir(d, false);
+    }).catch(function(){ $('contenido').innerHTML = '<div class="aviso">No se pudo cargar. Revisa tu conexión e inténtalo de nuevo.</div>'; });
+  }
+  function recibir(d, primera){
+    var mismoDia = estado.datos && estado.datos.dias[estado.dia] ? estado.datos.dias[estado.dia].corto : null;
+    estado.datos = d; estado.semana = d.semana;
+    var idx = 0;
+    d.dias.forEach(function(x, i){ if (x.esHoy) idx = i; });
+    if (!primera && mismoDia) d.dias.forEach(function(x, i){ if (x.corto === mismoDia) idx = i; });
+    if (d.semana !== 0 && primera) idx = 0;
+    estado.dia = idx;
+    $('sTitulo').textContent = d.semana === 0 ? 'Esta semana' : d.semana === 1 ? 'Próxima semana' : d.semana === -1 ? 'Semana pasada'
+      : (d.semana > 0 ? 'En ' + d.semana + ' semanas' : 'Hace ' + (-d.semana) + ' semanas');
+    $('sRango').textContent = d.rangoSemana;
+    $('lnkHoy').classList.toggle('oculto', d.semana === 0);
+    $('pie').textContent = 'Calculado desde la matriz de box y el registro de permisos · ' + d.actualizado;
+    pintarDias(); prepararRango(); pintar();
+  }
+  $('btnAnt').addEventListener('click', function(){ cargar(estado.semana - 1); });
+  $('btnSig').addEventListener('click', function(){ cargar(estado.semana + 1); });
+  $('lnkHoy').addEventListener('click', function(){ cargar(0); });
+
+  function pintarDias(){
+    $('dias').innerHTML = estado.datos.dias.map(function(x, i){
+      return '<button data-i="' + i + '" class="' + (i === estado.dia ? 'activo ' : '') + (x.esHoy ? 'hoy ' : '') + (x.feriado ? 'fer' : '') + '">' +
+        esc(x.corto) + '<b>' + Number(x.fecha.slice(8)) + '</b></button>';
+    }).join('');
+    Array.prototype.forEach.call($('dias').children, function(b){
+      b.addEventListener('click', function(){ estado.dia = +b.dataset.i; pintarDias(); prepararRango(); pintar(); });
+    });
+  }
+
+  // ---------- Filtros ----------
+  function grupo(id, attr, campo){
+    Array.prototype.forEach.call($(id).children, function(b){
+      b.addEventListener('click', function(){
+        Array.prototype.forEach.call($(id).children, function(x){ x.classList.toggle('activo', x === b); });
+        estado[campo] = b.dataset[attr];
+        if (campo === 'franja') $('cajaRango').classList.toggle('oculto', estado.franja !== 'rango');
+        pintar();
+      });
+    });
+  }
+  grupo('segFranja', 'f', 'franja'); grupo('segTipo', 't', 'tipo');
+  document.querySelectorAll('.vista button').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('.vista button').forEach(function(x){ x.classList.toggle('activo', x === b); });
+      estado.vista = b.dataset.v; pintar();
+    });
+  });
+  function prepararRango(){
+    var dia = estado.datos.dias[estado.dia]; if (!dia) return;
+    var ini = dia.slots.map(function(s){ return s[0]; }), fin = dia.slots.map(function(s){ return s[1]; });
+    var d0 = estado.desde, h0 = estado.hasta;
+    $('selDesde').innerHTML = ini.map(function(m){ return '<option value="' + m + '">' + hh(m) + '</option>'; }).join('');
+    $('selHasta').innerHTML = fin.map(function(m){ return '<option value="' + m + '">' + hh(m) + '</option>'; }).join('');
+    $('selDesde').value = ini.indexOf(d0) !== -1 ? d0 : ini[0];
+    $('selHasta').value = fin.indexOf(h0) !== -1 ? h0 : fin[fin.length - 1];
+  }
+  $('selDesde').addEventListener('change', function(){ estado.desde = +this.value; pintar(); });
+  $('selHasta').addEventListener('change', function(){ estado.hasta = +this.value; pintar(); });
+
+  function enFranja(s){
+    var f = estado.franja;
+    if (f === 'am') return s[1] <= 13 * 60;
+    if (f === 'pm') return s[0] >= 14 * 60 && !s[2];
+    if (f === 'ext') return !!s[2];
+    if (f === 'rango') return s[0] >= +$('selDesde').value && s[1] <= +$('selHasta').value;
+    return true;
+  }
+
+  // ---------- Pintar ----------
+  function pintar(){
+    var d = estado.datos; if (!d) return;
+    var dia = d.dias[estado.dia];
+    if (!dia) { $('contenido').innerHTML = '<div class="vacio">Sin datos para esta semana.</div>'; return; }
+    if (dia.feriado) {
+      $('resumen').innerHTML = '';
+      $('contenido').innerHTML = '<div class="aviso"><b>' + esc(dia.titulo) + ': feriado.</b><br>' + esc(dia.feriado) + '</div>';
+      return;
+    }
+    var idx = []; dia.slots.forEach(function(s, i){ if (enFranja(s)) idx.push(i); });
+    if (!idx.length) {
+      $('resumen').innerHTML = '';
+      $('contenido').innerHTML = '<div class="vacio">Este día no tiene atención en ese horario.</div>';
+      return;
+    }
+    var boxes = dia.boxes.filter(function(b){
+      return estado.tipo === 'todos' || (estado.tipo === 'clin' ? b.clinico : !b.clinico);
+    });
+    $('leyOcup').classList.toggle('oculto', estado.vista !== 'grilla');
+    if (estado.vista === 'grilla') return pintarGrilla(dia, idx, boxes);
+
+    var res = boxes.map(function(b){
+      var segs = [], libre = 0, todo = true;
+      idx.forEach(function(i){
+        var e = b.estado[i], s = dia.slots[i];
+        if (e === 'O') { todo = false; return; }
+        libre += s[1] - s[0];
+        var u = segs[segs.length - 1];
+        if (u && u.fin === s[0] && u.t === (e === 'T') && u.ext === !!s[2]) u.fin = s[1];
+        else segs.push({ ini: s[0], fin: s[1], t: e === 'T', ext: !!s[2] });
+      });
+      return { b: b, segs: segs, libre: libre, todo: todo && libre > 0 };
+    }).filter(function(x){ return x.libre > 0; });
+
+    res.sort(function(a, b){
+      return (b.todo - a.todo) || (b.libre - a.libre) || (num(a.b.box) - num(b.b.box));
+    });
+    var nTodo = res.filter(function(x){ return x.todo; }).length;
+    var franjaTxt = { todo: 'el día', am: 'la mañana', pm: 'la tarde', ext: 'la extensión',
+      rango: hh(+$('selDesde').value) + ' a ' + hh(+$('selHasta').value) }[estado.franja];
+    $('resumen').innerHTML = res.length
+      ? '<b>' + res.length + '</b> box con horas libres en ' + esc(franjaTxt) + (nTodo ? ' · <b>' + nTodo + '</b> libres todo el tramo' : '')
+      : 'Ningún box libre en ' + esc(franjaTxt);
+
+    if (!res.length) { $('contenido').innerHTML = '<div class="vacio">Todos los box están ocupados en ese horario.</div>'; return; }
+    $('contenido').innerHTML = '<div class="lista">' + res.map(function(x){
+      return '<div class="box' + (x.todo ? '' : ' parcial') + '"><div class="cab"><h3>' + esc(x.b.box) + '</h3>' +
+        '<span class="min">' + dur(x.libre) + ' libres</span></div>' +
+        '<div class="tags">' + (x.todo ? '<span class="tag todo">LIBRE TODO EL TRAMO</span>' : '') +
+        '<span class="tag">' + (x.b.clinico ? 'Clínico' : 'Otro') + '</span></div>' +
+        '<div class="franjas">' + x.segs.map(function(s){
+          return '<span class="fr' + (s.t ? ' t' : '') + '" title="' + (s.t ? 'Libre por ausencia' : 'Libre') + '">' +
+            hh(s.ini) + '–' + hh(s.fin) + (s.ext ? ' <small>ext.</small>' : '') + '</span>';
+        }).join('') + '</div></div>';
+    }).join('') + '</div>';
+  }
+  function num(t){ var m = String(t).match(/\d+/); return m ? +m[0] : 999; }
+
+  function pintarGrilla(dia, idx, boxes){
+    var libres = boxes.filter(function(b){ return idx.some(function(i){ return b.estado[i] !== 'O'; }); }).length;
+    $('resumen').innerHTML = '<b>' + libres + '</b> de ' + boxes.length + ' box con algún espacio libre';
+    var h = '<div class="grilla"><table><thead><tr><th>Hora</th>' + boxes.map(function(b){
+      return '<th class="vert">' + esc(b.box.replace(/^Box\s*/, 'B').replace(/\s*\(.*\)/, '')) + '</th>';
+    }).join('') + '</tr></thead><tbody>';
+    var extMarcado = false;
+    idx.forEach(function(i){
+      var s = dia.slots[i];
+      var cls = (s[0] % 60 === 0 ? 'hora' : '') + (s[2] && !extMarcado ? ' extini' : '');
+      if (s[2]) extMarcado = true;
+      h += '<tr class="' + cls + '"><th>' + hh(s[0]) + '</th>' + boxes.map(function(b){
+        var e = b.estado[i];
+        return '<td class="' + e + '" title="' + esc(b.box) + ' ' + hh(s[0]) + '–' + hh(s[1]) + ': ' +
+          (e === 'L' ? 'libre' : e === 'T' ? 'libre por ausencia' : 'ocupado') + '"></td>';
+      }).join('') + '</tr>';
+    });
+    $('contenido').innerHTML = h + '</tbody></table></div>';
+  }
+
+  // ---------- Instalación ----------
+  (function(){
+    var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    var cerrado = leer('box_inst_cerrado'), evento = null;
+    function banner(texto, boton){
+      if (standalone || cerrado) return;
+      if (texto) $('bTexto').innerHTML = texto;
+      $('btnInstalar').classList.toggle('oculto', !boton);
+      $('bInstalar').classList.remove('oculto');
+    }
+    window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); evento = e; banner(null, true); });
+    $('btnInstalar').addEventListener('click', function(){ if (!evento) return; evento.prompt(); evento.userChoice.then(function(){ evento = null; $('bInstalar').classList.add('oculto'); }); });
+    $('btnCerrarInst').addEventListener('click', function(){ guardar('box_inst_cerrado', '1'); $('bInstalar').classList.add('oculto'); });
+    var ua = navigator.userAgent;
+    var ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    if (ios && !standalone) {
+      var safari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua);
+      banner(safari ? 'Toca <b>Compartir</b> ⬆️ y luego <b>"Agregar a inicio"</b>.' : 'Abre este link en <b>Safari</b> y toca Compartir ⬆️ → "Agregar a inicio".', false);
+    }
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
+    var c = leer('box_clave');
+    if (c) { $('recordar').checked = true; entrar(c); }
+  })();
+</script>
+</body>
+</html>
