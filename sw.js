@@ -1,6 +1,6 @@
 // Guarda la "cáscara" de la app para que abra rápido y sin conexión.
 // Los datos (horarios, box, permisos) siempre se piden en línea a la planilla.
-var VERSION = 'sector-azul-v1';
+var VERSION = 'box-libres-v1';
 var ARCHIVOS = ['./', './index.html', './manifest.json',
   './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
 
