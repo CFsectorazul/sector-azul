@@ -109,6 +109,14 @@
   .instalar .txt .tit{display:block;font-weight:700;font-size:15px}
   .instalar button{background:#fff;color:#163a78;border:0;border-radius:9px;padding:9px 12px;font-weight:700;font-size:14px;cursor:pointer}
   .instalar .cerrar{background:transparent;color:#fff;opacity:.8;padding:6px;font-size:18px}
+  .saldos{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+  .saldo{background:var(--blanco);border-radius:12px;padding:12px 14px;box-shadow:0 1px 2px rgba(20,40,80,.06)}
+  .saldo .tit{font-size:13px;font-weight:700;color:var(--suave);text-transform:uppercase;letter-spacing:.04em}
+  .saldo .num{font-size:30px;font-weight:800;color:var(--azul-osc);line-height:1.15;margin-top:4px}
+  .saldo .num small{font-size:14px;font-weight:600;color:var(--suave)}
+  .saldo .det{font-size:13px;color:var(--suave)}
+  .saldo.neg .num{color:var(--rojo)}
+  .saldo .nota{font-size:13px;color:var(--naranjo);margin-top:4px}
 </style>
 </head>
 <body>
@@ -337,6 +345,19 @@
     }).join('');
   }
 
+  function nro(x){ return String(x).replace('.', ','); }
+  function saldo(titulo, unidad, s){
+    if (s.pendiente) {
+      return '<div class="saldo"><div class="tit">' + esc(titulo) + '</div><div class="num">—</div>' +
+        '<div class="nota">Pendiente: falta tu certificado de vacaciones.</div></div>';
+    }
+    var neg = s.saldo < 0;
+    return '<div class="saldo' + (neg ? ' neg' : '') + '"><div class="tit">' + esc(titulo) + '</div>' +
+      '<div class="num">' + nro(s.saldo) + ' <small>' + esc(unidad) + '</small></div>' +
+      '<div class="det">Inicial ' + nro(s.inicial) + ' · usados ' + nro(s.usados) + '</div>' +
+      (neg ? '<div class="nota">Revisar con tu jefatura.</div>' : '') + '</div>';
+  }
+
   function pintarPermisos(d){
     var hoy = d.hoy;
     var vig = d.permisos.filter(function(p){ return p.hasta >= hoy; }).reverse();
@@ -346,7 +367,12 @@
         '<div class="det">' + esc(p.texto) + (p.jornada ? ' · ' + esc(p.jornada) : '') +
         '<small>' + (p.dias ? (p.dias == 0.5 ? 'medio día' : esc(String(p.dias).replace('.', ',')) + (p.dias == 1 ? ' día' : ' días')) : '') + '</small></div></div>';
     }
-    var h = '<div class="grupo">Vigentes y próximos</div>';
+    var h = '';
+    if (d.saldos) {
+      h += '<div class="grupo">Mis saldos 2026</div><div class="saldos">' +
+        saldo('Feriado legal', d.saldos.fl.saldo == 1 ? 'día hábil' : 'días hábiles', d.saldos.fl) + saldo('Administrativos', d.saldos.adm.saldo == 1 ? 'día' : 'días', d.saldos.adm) + '</div>';
+    }
+    h += '<div class="grupo">Vigentes y próximos</div>';
     h += vig.length ? vig.map(function(p){ return item(p, false); }).join('') : '<div class="vacio">No tienes permisos vigentes ni próximos.</div>';
     h += '<div class="grupo">Anteriores</div>';
     h += ant.length ? ant.map(function(p){ return item(p, true); }).join('') : '<div class="vacio">Sin permisos anteriores registrados.</div>';
